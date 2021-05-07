@@ -65,6 +65,7 @@ spec:
       - name: bosco-ssh-multi-private-key-volume
         secret:
           secretName: {{ .Values.RemoteCluster.MultiPrivateKeySecret }}
+          defaultMode: 256
       {{ end }}
       {{ if .Values.HostCredentials.HostCertKeySecret }}
       - name: osg-hosted-ce-hostcertkey-volume
