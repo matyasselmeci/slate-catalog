@@ -52,13 +52,20 @@ spec:
         configMap:
           name: osg-hosted-ce-{{ .Values.Instance }}-slate-scitokens
       {{ end }}
+      {{ if .Values.RemoteCluster.PrivateKeySecret }}
       - name: bosco-ssh-private-key-volume
-        secret: 
+        secret:
           secretName: {{ .Values.RemoteCluster.PrivateKeySecret }}
           items:
           - key: bosco.key
             path: bosco.key
             mode: 256
+      {{ end }}
+      {{ if .Values.RemoteCluster.MultiPrivateKeySecret }}
+      - name: bosco-ssh-multi-private-key-volume
+        secret:
+          secretName: {{ .Values.RemoteCluster.MultiPrivateKeySecret }}
+      {{ end }}
       {{ if .Values.HostCredentials.HostCertKeySecret }}
       - name: osg-hosted-ce-hostcertkey-volume
         secret:
@@ -160,9 +167,15 @@ spec:
         - name: osg-hosted-ce-{{ .Values.Instance }}-configuration
           mountPath: /tmp/99-local.ini
           subPath: 99-local.ini
+        {{ if .Values.RemoteCluster.PrivateKeySecret }}
         - name: bosco-ssh-private-key-volume
           mountPath: /etc/osg/bosco.key
           subPath: bosco.key
+        {{ end }}
+        {{ if .Values.RemoteCluster.MultiPrivateKeySecret }}
+        - name: bosco-ssh-multi-private-key-volume
+          mountPath: /etc/osg/boscokeys
+        {{ end }}
         - name: osg-hosted-ce-{{ .Values.Instance }}-htcondor-ce-configuration
           mountPath: /etc/condor-ce/config.d/99-instance.conf
           subPath: 99-instance.conf
